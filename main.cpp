@@ -9,7 +9,9 @@
 #include <string>
 
 #include "utils.h"
+#include "inpainting.h"
 
+using namespace std;
 
 #define DEBUG 0
 
@@ -17,7 +19,7 @@
 double scale = 0.5;
 
 
-
+/*
 int main (int argc, char** argv) {
     // --------------- read filename strings ------------------
     std::string colorFilename, depthFilename, maskFilename;
@@ -163,5 +165,42 @@ int main (int argc, char** argv) {
     }
     
     showMat("final result", colorMat, 0);
+    return 0;
+}
+*/
+
+
+// @@@@@@ Debug Testing @@@@@@@@@
+int main (int argc, char** argv) {
+    
+    // Test 1 Gradient
+    cout << "-------------- Compute Gradient --------------" << endl;
+    cv::Mat A = (cv::Mat_<float>(3,3) << 1, 2, 3, 4, 5, 6, 7, 8, 9);
+    printMat(A, "A");
+
+    cv::Mat dx, dy;
+    computeGradient(A, dx, dy);
+
+    printMat(dx, "dx");
+    printMat(dy, "dy");
+    
+    // Test 2 Laplacian
+    cout << "-------------- Compute Laplacian --------------" << endl;
+    cv::Mat laplacian;
+
+    computeLaplacian(A, laplacian);
+    printMat(laplacian, "laplacian");
+
+    // Test 4 Sparse Matrix Building...
+    cout << "-------------- Sparse Building --------------" << endl;
+    
+    cv::Mat filled;
+    cv::Mat fillRegion = (cv::Mat_<uchar>(3,3) << 0, 255, 0, 255, 255, 255, 0, 255, 0);
+    reconstruct(A, fillRegion, laplacian, filled);
+    
+    printMat(A, "A");
+    printMat(fillRegion, "fillRegion");
+    printMat(filled, "filled");
+
     return 0;
 }

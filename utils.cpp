@@ -62,7 +62,7 @@ void loadInpaintingImages(
                        RADIUS,
                        RADIUS,
                        cv::BORDER_CONSTANT,
-                       cv::Scalar_<float>(0,0,0)
+                       cv::Scalar_<float>(0)
                        );
 }
 
@@ -308,4 +308,30 @@ cv::Mat computeSSD(const cv::Mat& tmplate, const cv::Mat& source, const cv::Mat&
     cv::copyMakeBorder(result, result, RADIUS, RADIUS, RADIUS, RADIUS, cv::BORDER_CONSTANT, 1.1f);
     
     return result;
+}
+
+void computeGradient(const cv::Mat& src, cv::Mat& dx, cv::Mat& dy)   {
+    cv::Mat kernelx = (cv::Mat_<float>(1,3)<<-0.5, 0, 0.5);
+    cv::Mat kernely = (cv::Mat_<float>(3,1)<<-0.5, 0, 0.5);
+    cv::filter2D(src, dx, CV_32F, kernelx, cv::Point(-1, -1), 0, cv::BORDER_REPLICATE);
+    cv::filter2D(src, dy, CV_32F, kernely, cv::Point(-1, -1), 0, cv::BORDER_REPLICATE);
+    dx.col(dx.cols - 1) *= 2;
+    dx.col(0) *= 2;
+    dy.row(dy.rows - 1) *= 2;
+    dy.row(0) *= 2;
+}
+
+void computeLaplacian(const cv::Mat& src, cv::Mat& laplacian) {
+    cv::Mat src_blur;
+    int kernel_size = 1;
+    double scale = 1.0;
+    double delta = 0;
+    int border = cv::BORDER_REPLICATE;
+    // Reduce noise by blurring with a Gaussian filter ( kernel size = 3 )
+    GaussianBlur( src, src_blur, cv::Size(3, 3), 0, 0, border);
+    cv::Laplacian( src_blur, laplacian, CV_32F, kernel_size, scale, delta, border);
+}
+
+void printMat(const cv::Mat& src, std::string name)   {
+    std::cout << name << " = " << std::endl << cv::format(src, cv::Formatter::FMT_PYTHON) << std::endl << std::endl;
 }

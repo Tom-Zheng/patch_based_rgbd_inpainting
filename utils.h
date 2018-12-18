@@ -52,4 +52,11 @@ void transferPatch(const cv::Point& psiHatQ, const cv::Point& psiHatP, cv::Mat& 
 
 cv::Mat computeSSD(const cv::Mat& tmplate, const cv::Mat& source, const cv::Mat& tmplateMask);
 
+// Add by Tian Zheng
+void computeGradient(const cv::Mat& src, cv::Mat& dx, cv::Mat& dy);
+
+void computeLaplacian(const cv::Mat& src, cv::Mat& laplacian);
+
+void printMat(const cv::Mat& src, std::string name);
+
 #endif
